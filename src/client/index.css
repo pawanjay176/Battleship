@@ -1,0 +1,94 @@
+.game-body{
+	margin: 0 auto;
+	max-width: 800px;
+	text-align: center;
+	padding: 40px;
+}
+
+.key{
+	width: 200px;
+	width: 200px;
+	position: absolute;
+	margin-left: -50px;
+	margin-top: 125px;
+
+}
+
+.current-turn, .button-visible{
+	display: initial;
+}
+
+.current-turn.hidden, .button-hidden{
+	display: none;
+}
+
+button{
+	width: 200px;
+	background-color: teal;
+	color: white;
+}
+
+button.button-margin{
+	margin-top: 40px;
+}
+
+.initial-grid{
+	min-height: 400px;
+	min-width: 400px;
+}
+
+.button-new-board{
+	width: 400px;
+	margin: 0 auto;
+	text-align: center;
+	display: block;
+	margin-bottom: 40px;
+}
+
+.row{
+	height: 40px;
+	text-align: center;
+	width: auto;
+}
+
+.row#row-header{
+	padding-bottom: 10px;
+
+}
+.row#row-header > .square{
+	border: none;
+	text-align: center;
+	padding: 0 1px;
+	color: black;
+}
+
+.square{
+	width: 40px;
+	min-height: 40px;
+	display: inline-block;
+	text-align: center;
+	line-height: 40px;
+	color: red;
+	border: 1px solid black;
+}
+
+.square#square-header{
+	border: none;
+	color: black;
+}
+
+.ship, .enemy-square.ship{
+	background-color: gray;
+}
+
+.open, .enemy-square.missed{
+	background-color: lightblue;
+}
+
+.damage{
+	background-color: red;
+}
+
+.enemy-square{
+	background-color: white;
+}
