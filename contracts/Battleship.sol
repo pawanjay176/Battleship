@@ -3,6 +3,10 @@ pragma solidity ^0.4.13;
 import "./MerkleProof.sol";
 
 contract Battleship {
+
+    /**
+   * @dev Various game parameters 
+   */
     address public player1;
     address public player2;
     bytes32 public player1MerkleRoot;
@@ -14,13 +18,25 @@ contract Battleship {
     uint public lastMoveTime;
     uint public constant timeLimit = 2 hours;
     
+
     enum GameStatus {NotStarted, Player1Joined, Started, Player1Won, Player2Won}
+    
+    /**
+   * @dev Mapping of all player moves to bool. true indicating already played 
+   */
     mapping (bytes3 => bool) public player1Moves;
     mapping (bytes3 => bool) public player2Moves;
     
+    /**
+   * @dev Keeps track of last move of each player to verify merkle proof in subsequent turn 
+   */
     bytes3 public player1LastMove;
     bytes3 public player2LastMove;
     
+
+    /**
+   * @dev Various events. Names self-explanatory 
+   */
     event Player1JoinedEvent(address player1);
     event Player2JoinedEvent(address player2);
     event GameStartedEvent(address player1, address player2);
@@ -30,6 +46,10 @@ contract Battleship {
     event Player2MoveEvent(bytes3 move);
     
     
+
+    /**
+   * @dev Modifier's for checking GameStatus
+   */
     modifier GameNotStarted {
         require(status==GameStatus.NotStarted, "Game not in NotStarted phase");
         _;
@@ -51,7 +71,11 @@ contract Battleship {
         _;
     }
     
-    // First player calls constructor
+    
+    /**
+   * @dev Constructor. Player 1 calls it to initiate the game 
+   * @param _boardMerkleRoot Merkle root of player 1's board
+   */
     constructor (bytes32 _boardMerkleRoot) public payable {
         player1 = msg.sender;
         player1MerkleRoot = _boardMerkleRoot;
@@ -59,7 +83,10 @@ contract Battleship {
         emit Player1JoinedEvent(msg.sender);
     }
     
-    // Also make sure game state is in Player1Joined using a modifier
+   /**
+   * @dev Function for player 2 to join the game 
+   * @param _boardMerkleRoot Merkle root of player 2's board
+   */
     function joinGame (bytes32 _boardMerkleRoot) public payable Player1Joined {
         player2 = msg.sender;
         player2MerkleRoot = _boardMerkleRoot;
@@ -68,6 +95,12 @@ contract Battleship {
         emit Player2JoinedEvent(msg.sender);
     }
     
+
+     /**
+   * @dev First move does not require any merkle proof. 
+   *      TODO: Don't have a separate function for first move 
+   * @param _move current move denoted by ("000" to "100")
+   */
     function firstMove(bytes3 _move) public {
         require(msg.sender==player1, "Invalid player");
         player1Moves[_move] = true;
@@ -135,12 +168,18 @@ contract Battleship {
         turn++;
     }
         
-    // Simple claim reward without any proof
+    /**
+   * @dev Function for claiming rewards in case everything went smoothly 
+   */
     function claimReward () public {
         require((msg.sender==player1 && status == GameStatus.Player1Won) || (msg.sender==player2 && status == GameStatus.Player2Won), "Cannot claim without winning game");
         msg.sender.transfer(address(this).balance);        
     }
     
+
+    /**
+   * @dev Function for claiming rewards in case other player doesn't make a move for specified amount of time 
+   */
     function claimRewardOnTimeout() public {
         require((msg.sender==player1 && turn%2==0) || (msg.sender==player2 && turn%2==1), "Cannot claim timeout reward on your own move");
         require(status==GameStatus.Started, "Game not in started phase");
